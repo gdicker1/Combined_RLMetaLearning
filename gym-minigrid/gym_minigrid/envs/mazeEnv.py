@@ -12,6 +12,7 @@ class MazeEnv(MiniGridEnv):
         limit=1, # 1 to size
         agent_start_pos=(1,1),
         agent_start_dir=0,
+        seed=1000
     ):
         self.agent_start_pos = agent_start_pos
         self.agent_start_dir = agent_start_dir
@@ -21,6 +22,7 @@ class MazeEnv(MiniGridEnv):
         super().__init__(
             grid_size = self.size,
             max_steps = 4*self.size*self.size,
+            seed = seed,
             # Set this to True for maximum speed
             see_through_walls=True
         )
@@ -53,27 +55,31 @@ class MazeEnv(MiniGridEnv):
 
         obj_type=Wall
         # horizontal wall
-        gap1 = self._rand_int(1, size)
-        while gap1%2 == 0:
-            gap1 = self._rand_int(1, size)
-        for i in range(size+1):
-            if i+1 != gap1:
+        # generate gap positions
+        gap1 = self._rand_int(0, size)
+        while gap1%2 == 1:
+            gap1 = self._rand_int(0, size)
+        # build walls
+        for i in range(size):
+            if i != gap1:
                 self.grid.set(x+i, y+div, obj_type())
 
         # vertical wall 
-        if div == 1:
-            gap2 = 1
-            gap3 = 3
+        if div < 3:
+            gap2 = 0
+            gap3 = 2
         else:   
-            gap2 = self._rand_int(1, div-1)
-            while gap2%2 == 0:
-                gap2 = self._rand_int(1, div-1)
-            gap3 = self._rand_int(div+1, size)
-            while gap3%2 == 0:
-                gap3 = self._rand_int(div+1, size)
+            # generate gap positions
+            gap2 = self._rand_int(0, div)
+            while gap2%2 == 1:
+                gap2 = self._rand_int(0, div)
 
+            gap3 = self._rand_int(div+1, size)
+            while gap3%2 == 1:
+                gap3 = self._rand_int(div+1, size)
+        # build walls
         for i in range(size):
-            if i+1 != gap2 and i+1 != gap3:
+            if i != gap2 and i != gap3:
                 self.grid.set(x+div, y+i, obj_type())
 
         if size/2 > min:
