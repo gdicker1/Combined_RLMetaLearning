@@ -10,6 +10,7 @@ class MazeEnv(MiniGridEnv):
         self,
         size=3, # 2 or greater 
         limit=1, # 1 to size
+        obstacle_type=None,
         agent_start_pos=(1,1),
         agent_start_dir=0,
         seed=1000
@@ -18,6 +19,7 @@ class MazeEnv(MiniGridEnv):
         self.agent_start_dir = agent_start_dir
         self.size = pow(2,size)+1
         self.limit = pow(2,limit)+1
+        self.obstacle_type = obstacle_type
 
         super().__init__(
             grid_size = self.size,
@@ -88,33 +90,59 @@ class MazeEnv(MiniGridEnv):
             self._recursive_division(x+div+1, y, newSize, min)
             self._recursive_division(x, y+div+1, newSize, min)
             self._recursive_division(x+div+1, y+div+1, newSize, min)
+        elif self.limit != 1:
+            newSize = int((size-1)/2)
+            self._construct_room(x, y, newSize)
+            self._construct_room(x+div+1, y, newSize)
+            self._construct_room(x, y+div+1, newSize)
+            self._construct_room(x+div+1, y+div+1, newSize)
+
+    def _construct_room(self, x, y, size):
+        div = int((size-1)/2)
+        # Generate lava wall
+        if self.obstacle_type == Lava:
+            gap = self._rand_int(0, size)
+            dir = self._rand_bool()
+            
+            if dir == 0:
+                for i in range(size):
+                    if i != gap:
+                        self.grid.set(x+i, y+div, self.obstacle_type())
+            else:
+                for i in range(size):
+                    if i != gap:
+                        self.grid.set(x+div, y+i, self.obstacle_type())  
 
 
 # empty room
 class EmptyEnv9x9(MazeEnv):
     def __init__(self, **kwargs):
-        super().__init__(size=3, limit=3, **kwargs)
+        super().__init__(size=3, limit=3, obstacle_type=None, **kwargs)
 
 # simple maze
 class MazeEnv9x9(MazeEnv):
     def __init__(self, **kwargs):
-        super().__init__(size=3, limit=1, **kwargs)
+        super().__init__(size=3, limit=1, obstacle_type=None, **kwargs)
 
 # medium maze with small rooms
 class MazeEnv17x17EZ(MazeEnv):
     def __init__(self, **kwargs):
-        super().__init__(size=4, limit=2, **kwargs)
+        super().__init__(size=4, limit=2, obstacle_type=None, **kwargs)
 
 # medium maze w/o rooms
 class MazeEnv17x17(MazeEnv):
     def __init__(self, **kwargs):
-        super().__init__(size=4, limit=1, **kwargs)
+        super().__init__(size=4, limit=1, obstacle_type=Lava, **kwargs)
 
-# hard amze w/ small rooms
+# hard maze w/ small rooms
 class MazeEnv33x33(MazeEnv):
     def __init__(self, **kwargs):
+        super().__init__(size=5, limit=2, obstacle_type=None, **kwargs)
 
-        super().__init__(size=5, limit=2, **kwargs)
+# large maze w/ large rooms
+class MazeEnv33x33BigRoom(MazeEnv):
+    def __init__(self, **kwargs):
+        super().__init__(size=5, limit=3, obstacle_type=Lava, **kwargs)
 
 register(
     id='MiniGrid-Maze-9x9-v0',
@@ -139,4 +167,9 @@ register(
 register(
     id='MiniGrid-Maze-33x33-v0',
     entry_point='gym_minigrid.envs:MazeEnv33x33'
+)
+
+register(
+    id='MiniGrid-Maze-33x33-v1',
+    entry_point='gym_minigrid.envs:MazeEnv33x33BigRoom'
 )
