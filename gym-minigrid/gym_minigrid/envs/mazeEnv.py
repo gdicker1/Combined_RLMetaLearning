@@ -11,6 +11,7 @@ class MazeEnv(MiniGridEnv):
         size=3, # 2 or greater 
         limit=1, # 1 to size
         obstacle_type=None,
+        ball_level=0, # 1 to 10
         agent_start_pos=(1,1),
         agent_start_dir=0,
         seed=1000
@@ -20,6 +21,7 @@ class MazeEnv(MiniGridEnv):
         self.size = pow(2,size)+1
         self.limit = pow(2,limit)+1
         self.obstacle_type = obstacle_type
+        self.ball_level = ball_level
 
         super().__init__(
             grid_size = self.size,
@@ -35,6 +37,14 @@ class MazeEnv(MiniGridEnv):
 
         # Generate the surrounding walls
         self.grid.wall_rect(0, 0, width, height)
+
+        # place moveable objeccts
+        if self.ball_level > 0:
+            for i in range(self.size*self.ball_level):
+                x = self._rand_int(0, int((self.size-1)/2))*2+1
+                y = self._rand_int(0, int((self.size-1)/2))*2+1
+                if x > 1 or y > 1: # can't populate agent start position
+                    self.put_obj(Ball(), x, y)
 
         # Generate maze
         if self.limit < self.size:
@@ -55,7 +65,6 @@ class MazeEnv(MiniGridEnv):
     def _recursive_division(self, x, y, size, min):
         div = int((size-1)/2)
 
-        obj_type=Wall
         # horizontal wall
         # generate gap positions
         gap1 = self._rand_int(0, size)
@@ -64,7 +73,10 @@ class MazeEnv(MiniGridEnv):
         # build walls
         for i in range(size):
             if i != gap1:
-                self.grid.set(x+i, y+div, obj_type())
+                self.grid.set(x+i, y+div, Wall())
+            else:
+                if size > 7:
+                    self.grid.set(x+i, y+div, Door(color='yellow'))
 
         # vertical wall 
         if div < 3:
@@ -82,7 +94,10 @@ class MazeEnv(MiniGridEnv):
         # build walls
         for i in range(size):
             if i != gap2 and i != gap3:
-                self.grid.set(x+div, y+i, obj_type())
+                self.grid.set(x+div, y+i,  Wall())
+            else:
+                if size > 7:
+                    self.grid.set(x+div, y+i, Door(color='yellow'))
 
         if size/2 > min:
             newSize = int((size-1)/2)
@@ -113,7 +128,6 @@ class MazeEnv(MiniGridEnv):
                     if i != gap:
                         self.grid.set(x+div, y+i, self.obstacle_type())  
 
-
 # empty room
 class EmptyEnv9x9(MazeEnv):
     def __init__(self, **kwargs):
@@ -142,7 +156,7 @@ class MazeEnv33x33(MazeEnv):
 # large maze w/ large rooms
 class MazeEnv33x33BigRoom(MazeEnv):
     def __init__(self, **kwargs):
-        super().__init__(size=5, limit=3, obstacle_type=Lava, **kwargs)
+        super().__init__(size=5, limit=2, obstacle_type=Lava, ball_level=3, **kwargs)
 
 register(
     id='MiniGrid-Maze-9x9-v0',
