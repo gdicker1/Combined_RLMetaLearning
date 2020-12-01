@@ -1,1 +1,0 @@
-from gym_minigrid.envs.mazeEnv import *
