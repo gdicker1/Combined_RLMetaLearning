@@ -270,9 +270,9 @@ Set role to worker
 
 Log on as a regular user with sudo privileges to setup kubeadmin
 	
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
+	mkdir -p $HOME/.kube
+	sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+	sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 Download the Calico networking manifest for Kubernetes API datastore
 
