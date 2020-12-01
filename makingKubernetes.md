@@ -9,11 +9,11 @@ Using OPALHPC-{2,3,5,6} as the worker nodes (Kubelets)
 # Contents
 * Needed to Install
 	* Kubernetes Requirements
-* Installing Docker
 * Verify MAC address and product_uuid are unique for every node
 * Letting iptables see bridged traffic
 * Set ports to open [skipped]
 * Disable Swap
+* Installing Docker
 * Installing kubeadm, kubelet and kubectl
 * Creating Control Plane and First Install Verification
 
@@ -38,54 +38,6 @@ Using OPALHPC-{2,3,5,6} as the worker nodes (Kubelets)
 * Unique hostname, MAC address, and product_uuid for every node. [check]
 * Certain ports are open on your machines. [need to do]
 * Swap disabled. You MUST disable swap in order for the kubelet to work properly. [need to do]
-
-## Installing Docker
-Following guide at: https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
-
-Install required packages
-    
-    sudo yum install -y yum-utils device-mapper-persistent-data lvm2
-    
-Add the Docker repo
-
-	sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-
-Install Docker
-
-	sudo yum update -y && sudo yum install -y \
-	  containerd.io-1.2.13 \
-	  docker-ce-19.03.11 \
-	  docker-ce-cli-19.03.11
-
-Create /etc/docker and set up the Docker daemon
-
-	sudo mkdir /etc/docker
-	cat <<EOF | sudo tee /etc/docker/daemon.json
-	{
-	  "exec-opts": ["native.cgroupdriver=systemd"],
-	  "log-driver": "json-file",
-	  "log-opts": {
-	    "max-size": "100m"
-	  },
-	  "storage-driver": "overlay2",
-	  "storage-opts": [
-	    "overlay2.override_kernel_check=true"
-	  ]
-	}
-	EOF
-	
-Create `/etc/systemd/system/docker.service.d`
-	
-	sudo mkdir -p /etc/systemd/system/docker.service.d
-
-Restart Docker
-
-	sudo systemctl daemon-reload
-	sudo systemctl restart docker
-
-Run docker on boot
-
-	sudo systemctl enable docker
 
 ## Verify MAC address and product_uuid are unique for every node
 * Use `ip link` or `ifconfig -a` to check the MAC address of every node that is going to be in the cluster
@@ -199,6 +151,55 @@ Activate the swap partition and verify its presence
 
 	swapon -a
 	swapon -s
+
+## Installing Docker
+Following guide at: https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
+
+Install required packages
+    
+    sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+    
+Add the Docker repo
+
+	sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+Install Docker
+
+	sudo yum update -y && sudo yum install -y \
+	  containerd.io-1.2.13 \
+	  docker-ce-19.03.11 \
+	  docker-ce-cli-19.03.11
+
+Create /etc/docker and set up the Docker daemon
+
+	sudo mkdir /etc/docker
+	cat <<EOF | sudo tee /etc/docker/daemon.json
+	{
+	  "exec-opts": ["native.cgroupdriver=systemd"],
+	  "log-driver": "json-file",
+	  "log-opts": {
+	    "max-size": "100m"
+	  },
+	  "storage-driver": "overlay2",
+	  "storage-opts": [
+	    "overlay2.override_kernel_check=true"
+	  ]
+	}
+	EOF
+	
+Create `/etc/systemd/system/docker.service.d`
+	
+	sudo mkdir -p /etc/systemd/system/docker.service.d
+
+Restart Docker
+
+	sudo systemctl daemon-reload
+	sudo systemctl restart docker
+
+Run docker on boot
+
+	sudo systemctl enable docker
+
 
 ## Installing kubeadm, kubelet and kubectl
 The components are:
