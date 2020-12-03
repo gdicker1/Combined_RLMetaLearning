@@ -4,7 +4,8 @@
 	branch = master
 [submodule "src/gym-minigrid"]
 	path = src/gym-minigrid
-	url = https://github.com/gdicker1/gym-minigrid
+	url = https://github.com/WyomingWolf/gym-minigrid
+	branch = GeneMazeEnv
 [submodule "src/maml_rl"]
 	path = src/maml_rl
 	url = https://github.com/cbfinn/maml_rl
