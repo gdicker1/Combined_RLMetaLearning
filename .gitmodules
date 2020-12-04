@@ -8,4 +8,4 @@
 	branch = GeneMazeEnv
 [submodule "src/maml_rl"]
 	path = src/maml_rl
-	url = https://github.com/cbfinn/maml_rl
+	url = https://github.com/zephconnell/maml_rl
