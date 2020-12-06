@@ -1,7 +1,7 @@
 [submodule "src/POET"]
 	path = src/POET
 	url = https://github.com/gdicker1/POET
-	branch = master
+	branch = minigrid_poet
 [submodule "src/gym-minigrid"]
 	path = src/gym-minigrid
 	url = https://github.com/WyomingWolf/gym-minigrid
