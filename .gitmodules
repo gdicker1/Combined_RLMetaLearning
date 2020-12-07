@@ -9,3 +9,4 @@
 [submodule "src/maml_rl"]
 	path = src/maml_rl
 	url = https://github.com/zephconnell/maml_rl
+	branch = minigrid_maml_rl
